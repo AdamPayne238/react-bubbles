@@ -21,7 +21,6 @@ const Login = props => {
     .then(response => {
       console.log("Post Response", response)
       localStorage.setItem('token', response.data.payload)
-      //PUSH TO BUBBLE PAGE WITH TOKEN right now '/' so find it
       props.history.push("/bubbles")
     })
     .catch(error => {
