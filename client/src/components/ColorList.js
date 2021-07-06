@@ -1,13 +1,12 @@
-import React, { useState } from "react";
-import axios from "axios";
+import React, { useState, useEffect } from "react";
+import { axiosWithAuth } from "../utils/axiosWithAuth";
 
 const initialColor = {
   color: "",
   code: { hex: "" }
 };
 
-const ColorList = ({ colors, updateColors }) => {
-  console.log(colors);
+const ColorList  = ({ colors, updateColors }) => {
   const [editing, setEditing] = useState(false);
   const [colorToEdit, setColorToEdit] = useState(initialColor);
 
@@ -16,15 +15,58 @@ const ColorList = ({ colors, updateColors }) => {
     setColorToEdit(color);
   };
 
+  useEffect(() => {
+    const colorToEdit = colors.find(color => {
+      
+    })
+    console.log("ColorEdit", colorToEdit)
+    if(colorToEdit){
+      updateColors(colorToEdit)
+    }
+  })
+
+
   const saveEdit = e => {
     e.preventDefault();
     // Make a put request to save your updated color
     // think about where will you get the id from...
     // where is is saved right now?
+    axiosWithAuth()
+    .put(`http://localhost:5000/api/colors/${colorToEdit.id}`, colorToEdit)
+    .then(response => {
+      console.log("Put List Response", response)
+      //if color.id is equal to response.data.id return new response.data. if not leave the same
+      updateColors(colors.map(color => {
+        if(color.id === response.data.id){
+          return response.data
+        } else {
+          return color
+        }
+      }))
+    })
+    .catch(error => {
+      console.log("", error)
+    })
+    
+    
   };
 
   const deleteColor = color => {
-    // make a delete request to delete this color
+   
+      axiosWithAuth()
+      .delete(`http://localhost:5000/api/colors/${color.id}`) 
+      .then(response => {
+        console.log("Delete Response", response)
+        updateColors(colors.filter(color => {
+          //if color id does not match response.data return response.data
+          if( color.id !== response.data){
+            return response.data
+          }
+        }))
+      })
+      .catch(error => {
+        console.log(error.response)
+      })
   };
 
   return (
